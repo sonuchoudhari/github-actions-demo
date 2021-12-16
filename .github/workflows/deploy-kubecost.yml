@@ -1,0 +1,43 @@
+name: Deploy kubecost using Github actions, helm on aks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+env:
+  CLUSTER_NAME: demo-aks-1
+  CLUSTER_RESOURCE_GROUP: demo-aks-rg
+  NAMESPACE: kubecost
+  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Helm
+        uses: Azure/setup-helm@v1
+        with:
+          version: v3.3.1
+
+      - name: Get AKS Credentials
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: ${{ env.CLUSTER_NAME }}
+          resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+          
+      - name: Adding Helm repo
+        run: |
+          helm repo add kubecost https://kubecost.github.io/cost-analyzer/
+          
+      - name: Run Helm Deploy
+        run: |
+          helm upgrade \
+            --install \
+            --create-namespace \
+            --atomic \
+            --wait \
+            --namespace ${{ env.NAMESPACE }} \
+            kubecost kubecost/cost-analyzer \
+            --set kubecostToken="YWxnaWJib25AbWljcm9zb2Z0LmNvbQ==xm343yadf98"
