@@ -5,8 +5,8 @@ on:
   push:
     branches: [ main ]
 env:
-  CLUSTER_NAME: demo-aks-1
-  CLUSTER_RESOURCE_GROUP: demo-aks-rg
+  CLUSTER_NAME: aks-demo-cluster
+  CLUSTER_RESOURCE_GROUP: demo-rg
   NAMESPACE: kubecost
   
 jobs:
